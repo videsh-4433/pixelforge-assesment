@@ -1,0 +1,61 @@
+x-app: &app
+  build:
+    context: .
+    dockerfile: docker/Dockerfile
+  volumes:
+    - .:/var/www/html
+  depends_on:
+    db:
+      condition: service_healthy
+
+services:
+  app:
+    <<: *app
+    command: php artisan serve --host=0.0.0.0 --port=8000
+    ports:
+      - "${APP_PORT:-8088}:8000"
+
+  queue:
+    <<: *app
+    command: php artisan queue:work --sleep=1
+    restart: unless-stopped
+
+  scheduler:
+    <<: *app
+    command: php artisan schedule:work
+    restart: unless-stopped
+
+  vite:
+    <<: *app
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    environment:
+      VITE_PORT: ${VITE_PORT:-5175}
+    ports:
+      - "${VITE_PORT:-5175}:5173"
+    depends_on: []
+
+  # Optional public HTTPS URL so Pixelforge webhooks reach local dev. Start it yourself with:
+  #   docker compose --profile tunnel up -d tunnel
+  #   docker compose logs tunnel | grep trycloudflare
+  # then set <that url>/api/webhooks/pixelforge as the key's webhook URL in the Pixelforge dashboard.
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    command: tunnel --no-autoupdate --url http://app:8000
+    profiles: [tunnel]
+    depends_on: [app]
+
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: pixelforge
+      POSTGRES_USER: pixelforge
+      POSTGRES_PASSWORD: secret
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pixelforge"]
+      interval: 3s
+      retries: 20
+
+volumes:
+  pgdata:

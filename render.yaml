@@ -1,0 +1,30 @@
+# Render Blueprint: New + > Blueprint > select this repo.
+services:
+  - type: web
+    name: pixelforge-studio
+    runtime: docker
+    plan: free
+    dockerfilePath: ./docker/production/Dockerfile
+    healthCheckPath: /up
+    envVars:
+      - key: APP_KEY            # generate with: docker compose exec app php artisan key:generate --show
+        sync: false
+      - key: APP_URL            # e.g. https://pixelforge-studio.onrender.com
+        sync: false
+      - key: PF_API_KEY         # a *separate* Pixelforge key for production
+        sync: false
+      - key: PF_WEBHOOK_SECRET  # that key's whsec_... secret
+        sync: false
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DB_URL
+        fromDatabase:
+          name: pixelforge-db
+          property: connectionString
+      - key: SESSION_SECURE_COOKIE
+        value: "true"
+
+databases:
+  - name: pixelforge-db
+    plan: free
+    databaseName: pixelforge
