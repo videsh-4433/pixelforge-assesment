@@ -22,7 +22,11 @@ RUN npm run build
 FROM dunglas/frankenphp:1-php8.4
 
 RUN install-php-extensions pdo_pgsql pgsql bcmath zip pcntl opcache intl \
-    && cp "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
+    && cp "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" \
+    # The base image grants frankenphp cap_net_bind_service (to bind ports < 1024). Hosts that
+    # forbid file capabilities (e.g. Render) then refuse to exec it ("Operation not permitted").
+    # We listen on an unprivileged port, so drop the capability.
+    && setcap -r /usr/local/bin/frankenphp
 
 WORKDIR /app
 COPY --from=vendor /app /app
