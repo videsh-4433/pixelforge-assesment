@@ -43,6 +43,7 @@ docker compose up -d                 # app, queue worker, scheduler, vite (runs 
 | `PF_MAX_IN_FLIGHT_PER_USER` | Generations one user can have running at once. Defaults to `3`. |
 | `PF_MAX_GENERATIONS_PER_USER_PER_DAY` | Per-user daily cap, reset at midnight UTC. Defaults to `50`. |
 | `PF_MAX_BALANCE_DOLLARS` | Cap on the free demo credits a user can hold. Defaults to `50`. |
+| `ADMIN_EMAILS` | Comma-separated emails that can see the admin report. The alternative is `php artisan app:make-admin`. |
 | `APP_PORT`, `VITE_PORT` | Host ports used by Docker Compose. |
 
 ### Webhooks in local dev
@@ -97,7 +98,7 @@ The repo includes a [render.yaml](render.yaml) Blueprint and a production image 
    - `APP_URL`: `https://<service>.onrender.com`
    - `PF_API_KEY` and `PF_WEBHOOK_SECRET`: from a **production** Pixelforge key
 3. Set that key's webhook URL to `https://<service>.onrender.com/api/webhooks/pixelforge`.
-4. Register, then promote yourself from the service's **Shell** tab: `php artisan app:make-admin you@example.com`.
+4. Register, then add your email to the `ADMIN_EMAILS` environment variable (comma-separated) to unlock the admin report. The free plan has no Shell tab.
 
 Free-tier caveats:
 

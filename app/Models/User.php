@@ -39,6 +39,11 @@ class User extends Authenticatable
         ];
     }
 
+    public function isAdmin(): bool
+    {
+        return $this->is_admin || in_array(strtolower($this->email), config('pixelforge.admin_emails'), true);
+    }
+
     public function generations(): HasMany
     {
         return $this->hasMany(Generation::class);

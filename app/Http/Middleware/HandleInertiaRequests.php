@@ -33,7 +33,10 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'auth' => [
-                'user' => $request->user()?->only('id', 'name', 'email', 'is_admin'),
+                'user' => $request->user() ? [
+                    ...$request->user()->only('id', 'name', 'email'),
+                    'is_admin' => $request->user()->isAdmin(),
+                ] : null,
             ],
             'credits' => fn () => $request->user() ? [
                 'balance' => Money::nanoToDecimal($request->user()->balance_nano),

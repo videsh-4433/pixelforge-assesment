@@ -17,6 +17,13 @@ return [
     // Give up submitting a generation (rate limited / overloaded) after this many minutes.
     'submit_give_up_after_minutes' => 15,
 
+    // Comma-separated emails that get the admin report, for hosts without shell access
+    // (e.g. Render's free plan). Users flagged with `php artisan app:make-admin` are admins too.
+    'admin_emails' => array_values(array_filter(array_map(
+        fn ($email) => strtolower(trim($email)),
+        explode(',', (string) env('ADMIN_EMAILS', '')),
+    ))),
+
     /*
      * Abuse limits. Pixelforge's limits are per *account* (shared by all our users): 3 generations
      * in flight, 60 requests/minute, 500 generations/day. Without per-user caps, one user with free

@@ -21,6 +21,8 @@ services:
         fromDatabase:
           name: pixelforge-db
           property: connectionString
+      - key: ADMIN_EMAILS       # comma-separated emails allowed to see /admin/report
+        sync: false
       - key: SESSION_SECURE_COOKIE
         value: "true"
 

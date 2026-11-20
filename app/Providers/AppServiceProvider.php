@@ -38,6 +38,6 @@ class AppServiceProvider extends ServiceProvider
     {
         Vite::prefetch(concurrency: 3);
 
-        Gate::define('admin', fn (User $user) => $user->is_admin);
+        Gate::define('admin', fn (User $user) => $user->isAdmin());
     }
 }

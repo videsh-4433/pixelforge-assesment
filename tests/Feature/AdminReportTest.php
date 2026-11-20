@@ -18,6 +18,14 @@ it('is only available to admins', function () {
     $this->actingAs(User::factory()->create())->get('/admin/report')->assertForbidden();
 });
 
+it('grants admin to emails listed in ADMIN_EMAILS', function () {
+    fakePixelforge(['pixelforge.promptedit.dev/v1/usage*' => Http::response(usageResponse('0.000000000', 0))]);
+    config(['pixelforge.admin_emails' => ['boss@example.com']]);
+
+    $this->actingAs(User::factory()->create(['email' => 'Boss@Example.com']))->get('/admin/report')->assertOk();
+    $this->actingAs(User::factory()->create(['email' => 'someone@example.com']))->get('/admin/report')->assertForbidden();
+});
+
 it('reports spend, provider cost and profit per day and user, reconciled with /v1/usage', function () {
     fakePixelforge(['pixelforge.promptedit.dev/v1/usage*' => Http::response(usageResponse('0.338160000', 2))]);
     $admin = User::factory()->create();
